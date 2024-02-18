@@ -20,7 +20,7 @@ options.add_argument('--disable-dev-shm-usage')
 origin = "MAD"
 destination = "TSF"
 start_date = date.today()
-end_date = "2024-03-15"
+end_date = "2024-12-30"
 
 def url_finder(origin, destination, start_date):
     start_date = start_date.strftime('%Y-%m-%d')
@@ -75,26 +75,31 @@ df,_ = fares_dataframe(driver)
 ## next dates
 
 current_date = start_date
-end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
-i = 1
-while current_date <= end_date:
+end = datetime.strptime(end_date, '%Y-%m-%d').date()
+i = 0
+all_null_counter = 0
+while current_date <= end and all_null_counter < 3:
     # print('iteration =', i)
     i += 1
-    print('iter =', i, "current:", current_date, "end:", end_date)
+    # print('iter =', i, "current:", current_date, "end:", end)
     # print("condition:", current_date <= end_date)
     # current_date = datetime.strptime(re.findall(r'tpStartDate=.{10}', driver.current_url)[0][-10:], '%Y-%m-%d').date()
     WebDriverWait(driver, 10).until(
         EC.visibility_of_element_located((By.XPATH, '//button[contains(@class,"carousel-next")]'))).click()
     df_temp, current_date = fares_dataframe(driver)
+    time.sleep(0.5)
+    # print(df_temp, df_temp['price'], df_temp['price'].isnull(), df_temp['price'].isnull().all())
+    all_null_counter += int(df_temp['price'].isnull().all())
+    # print(all_null_counter)
     df = pd.concat([df, df_temp])
     # print(df.tail(5))
 
-df.to_csv('MAD_TSF_20240218_20240315.csv', index=False)
+df['origin'] = origin
+df['destination'] = destination
+df['fetch_date'] = start_date
+df.to_csv('{0}_{1}_20240218_20240315.csv'.format(origin, destination, start_date.strftime('%Y%m%d'),end_date.replace('-','')), index=False)
 
 # driver.save_screenshot("screenshot1.png")
 driver.quit()
-
-
-
 
 
