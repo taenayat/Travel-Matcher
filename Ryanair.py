@@ -89,33 +89,55 @@ driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), opti
 driver.get(url)
 driver.find_element("xpath", '//button[@class="cookie-popup-with-overlay__button"]').click()
 
-# fares = driver.find_elements('xpath', '//carousel-item[@class="ng-star-inserted"]')
-# date=fares[3].find_elements('xpath', '//button[contains(@class,"date-item")]')
-fares = driver.find_elements('xpath', '//button[contains(@class,"date-item")]')
-fares[0].get_attribute("data-ref")
-fares[1].find_element(By.CLASS_NAME, value='date-item__day-of-week').get_attribute('innerHTML').strip()
+# fares = driver.find_elements('xpath', '//button[contains(@class,"date-item")]')
+# fares[0].get_attribute("data-ref")
+# fares[1].find_element(By.CLASS_NAME, value='date-item__day-of-week').get_attribute('innerHTML').strip()
 
-fares[1].find_elements(By.XPATH, value='.//span[contains(@class,"price")]')
-price_arr = [element.get_attribute('innerHTML') for element in fares[1].find_elements(By.XPATH, value='.//span[contains(@class,"price")]')]
-price = price_arr[1].strip() + '.' + price_arr[3].strip()
-''.join(map(lambda x: x.strip(), price_arr))
+# fares[1].find_elements(By.XPATH, value='.//span[contains(@class,"price")]')
+# price_arr = [element.get_attribute('innerHTML') for element in fares[1].find_elements(By.XPATH, value='.//span[contains(@class,"price")]')]
+# price = price_arr[1].strip() + '.' + price_arr[3].strip()
+# ''.join(map(lambda x: x.strip(), price_arr))
 
 
 
 fares = driver.find_elements('xpath', '//button[contains(@class,"date-item")]')
-l = []
+
+temp_list = []
 for fare in fares:
     date_value = fare.get_attribute("data-ref")
     day_of_week = fare.find_element(By.CLASS_NAME, value='date-item__day-of-week').get_attribute('innerHTML').strip()
     price_arr = [element.get_attribute('innerHTML') for element in fare.find_elements(By.XPATH, value='.//span[contains(@class,"price")]')]
     price = ''.join(map(lambda x: x.strip(), price_arr))
-    dic = {'date_value': date_value, 'day_of_week': day_of_week, 'price': price}
-    l.append(dic)
+    dic = {'date': date_value, 'day_of_week': day_of_week, 'price': price}
+    temp_list.append(dic)
+
+## output dataframe of a given page
+def fares_dataframe(driver):
+
+    fares = driver.find_elements('xpath', '//button[contains(@class,"date-item")]')
+    temp_list = []
+    for fare in fares:
+        date_value = fare.get_attribute("data-ref")
+        day_of_week = fare.find_element(By.CLASS_NAME, value='date-item__day-of-week').get_attribute('innerHTML').strip()
+        price_arr = [element.get_attribute('innerHTML') for element in fare.find_elements(By.XPATH, value='.//span[contains(@class,"price")]')]
+        price = ''.join(map(lambda x: x.strip(), price_arr))
+        dic = {'date': date_value, 'day_of_week': day_of_week, 'price': price}
+        temp_list.append(dic)
+    return pd.DataFrame(temp_list).replace('', None, inplace = True)
 
 
+import pandas as pd
+# df = pd.concat([df, pd.DataFrame(temp_list)], ignore_index=True)
+df = pd.DataFrame(temp_list)
+
+
+## next dates
+driver.find_element('xpath', '//button[contains(@class,"carousel-next")]').click()
+df = pd.concat([df, fares_dataframe(driver)])
 
 driver.save_screenshot("screenshot1.png")
 driver.quit()
+
 
 
 
