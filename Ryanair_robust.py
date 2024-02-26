@@ -87,7 +87,8 @@ while current_date <= end and all_null_counter < 3:
     WebDriverWait(driver, 10).until(
         EC.visibility_of_element_located((By.XPATH, '//button[contains(@class,"carousel-next")]'))).click()
     df_temp, current_date = fares_dataframe(driver)
-    time.sleep(0.5)
+    time.sleep(1)
+    print(df_temp)
     # print(df_temp, df_temp['price'], df_temp['price'].isnull(), df_temp['price'].isnull().all())
     all_null_counter += int(df_temp['price'].isnull().all())
     # print(all_null_counter)
@@ -97,7 +98,7 @@ while current_date <= end and all_null_counter < 3:
 df['origin'] = origin
 df['destination'] = destination
 df['fetch_date'] = start_date
-df.to_csv('{0}_{1}_20240218_20240315.csv'.format(origin, destination, start_date.strftime('%Y%m%d'),end_date.replace('-','')), index=False)
+df.to_csv('{0}_{1}_{2}_{3}.csv'.format(origin, destination, start_date.strftime('%Y%m%d'),end_date.replace('-','')), index=False)
 
 # driver.save_screenshot("screenshot1.png")
 driver.quit()
