@@ -162,7 +162,7 @@ driver.find_element("xpath", '//*[@id="cookie-popup-with-overlay"]/div/div[3]/bu
 # actions.move_to_element(one_way_flight).click().perform()
 
 ## origins
-origins = driver.find_element('xpath', '//*[@id="input-button__departure"]').click()
+driver.find_element('xpath', '//*[@id="input-button__departure"]').click()
 # driver.execute_script("arguments[0].click();", origins)
 
 # countries = driver.find_elements('xpath', '//fsw-countries[contains(@class,"countries__country")]')
@@ -202,36 +202,80 @@ destination_airport_name = re.sub('[\W_]+', '', destination_airports[0].get_attr
 print(destination_airport_name)
 
 
+## For loop
+# select origin box
+driver.find_element('xpath', '//*[@id="input-button__departure"]').click()
+origin_countries = driver.find_elements('xpath', '//span[contains(@class,"countries__country-inner")]')
+# for origin_country in origin_countries[:2]:
+# for origin_idx in range(len(origin_countries)):
+for origin_idx in range(1):
+    origin_countries = driver.find_elements('xpath', '//span[contains(@class,"countries__country-inner")]')
+    origin_country = origin_countries[origin_idx]
+    country_name = origin_country.get_attribute("innerHTML")
+    print(country_name)
+    origin_country.click()
+    time.sleep(1)
+
+    origin_airports_clickable = driver.find_elements(By.TAG_NAME, 'fsw-airport-item')
+    origin_airports = driver.find_elements('xpath', '//fsw-airport-item//span[@data-ref="airport-item__name"]')
+    # len(origin_airports)
+
+    trunc = 1
+    for origin_airport, origin_airport_clickable in zip(origin_airports[:trunc], origin_airports_clickable[:trunc]):
+        origin_airport_code = origin_airport.get_attribute("data-id")
+        print(origin_airport_code)
+        origin_airport_name = re.sub('[\W_]+', '', origin_airports[0].get_attribute("innerHTML"))
+        # origin_airports_clickable[0].click()
+        driver.execute_script("arguments[0].click();", origin_airport_clickable)
+        time.sleep(2)
+
+        destination_countries =  driver.find_elements('xpath', '//span[contains(@class,"countries__country-inner")]')
+        # for destination_country in destination_countries:
+        for origin_idx in range(len(origin_countries)):
+            if 'not-available' not in destination_country.get_attribute('class'): # dest country is available
+                destination_country.click()
+                destination_airports_clickable = driver.find_elements(By.TAG_NAME, 'fsw-airport-item')
+                destination_airports = driver.find_elements('xpath', '//fsw-airport-item//span[@data-ref="airport-item__name"]')
+                # len(destination_airports_clickable)
+
+                for destination_airport, destination_airport_clickable in zip(destination_airports, destination_airports_clickable):
+                    destination_airport_code = destination_airport.get_attribute("data-id")
+                    print(destination_airport_code)
+                    destination_airport_name = re.sub('[\W_]+', '', destination_airports[0].get_attribute("innerHTML"))
+                    print(destination_airport_name)
+                    time.sleep(1)
 
 
-## destinations
-destination = driver.find_element('xpath','//*[@id="input-button__destination"]')
-destination.send_keys('Venecia Treviso')
-airports = driver.find_elements(By.TAG_NAME, 'fsw-airport-item')
-driver.execute_script("arguments[0].click();", airports[1])
+
+
+# ## destinations
+# destination = driver.find_element('xpath','//*[@id="input-button__destination"]')
+# destination.send_keys('Venecia Treviso')
+# airports = driver.find_elements(By.TAG_NAME, 'fsw-airport-item')
+# driver.execute_script("arguments[0].click();", airports[1])
 # driver.find_element('xpath','//*[@id="ry-tooltip-3"]/div[2]/hp-app-controls-tooltips/fsw-controls-tooltips-container/fsw-controls-tooltips/fsw-destination-container/fsw-airports/div/fsw-airports-list/div[2]/div[1]/fsw-airport-item[2]').click() # first one in the list
 
 ## scroll to see better
 # ActionChains(driver).scroll_by_amount(0, 100).perform()
 
 ## departure date
-departure = driver.find_element('xpath','//*[@id="ry-tooltip-10"]/div[2]/hp-app-controls-tooltips/fsw-controls-tooltips-container/fsw-controls-tooltips/fsw-flexible-datepicker-container/fsw-datepicker/ry-datepicker-desktop/div')
-dates = departure.find_elements(By.CLASS_NAME, 'calendar-body__cell')
+# departure = driver.find_element('xpath','//*[@id="ry-tooltip-10"]/div[2]/hp-app-controls-tooltips/fsw-controls-tooltips-container/fsw-controls-tooltips/fsw-flexible-datepicker-container/fsw-datepicker/ry-datepicker-desktop/div')
+# dates = departure.find_elements(By.CLASS_NAME, 'calendar-body__cell')
 
-for date in dates: 
-    class_value = date.get_attribute('class')
-    if 'calendar-body__cell--disabled' not in class_value: # available dates
-        date_value = date.get_attribute('data-id')
-        # print(date_value)
-        if date_value == "2024-03-27":
-            print(date_value)
-            chosen_date = date
-            break
-chosen_date.click()
+# for date in dates: 
+#     class_value = date.get_attribute('class')
+#     if 'calendar-body__cell--disabled' not in class_value: # available dates
+#         date_value = date.get_attribute('data-id')
+#         # print(date_value)
+#         if date_value == "2024-03-27":
+#             print(date_value)
+#             chosen_date = date
+#             break
+# chosen_date.click()
 
 
 ## click search button
-driver.find_element('xpath', '//button[contains(@class,"flight-search-widget__start-search-cta")]').click()
+# driver.find_element('xpath', '//button[contains(@class,"flight-search-widget__start-search-cta")]').click()
 
 
 # time.sleep(2)
