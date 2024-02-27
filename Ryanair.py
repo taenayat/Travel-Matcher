@@ -162,23 +162,44 @@ driver.find_element("xpath", '//*[@id="cookie-popup-with-overlay"]/div/div[3]/bu
 # actions.move_to_element(one_way_flight).click().perform()
 
 ## origins
-origins = driver.find_element('xpath', '//*[@id="input-button__departure"]')
+origins = driver.find_element('xpath', '//*[@id="input-button__departure"]').click()
 # driver.execute_script("arguments[0].click();", origins)
-origins.click()
+
 # countries = driver.find_elements('xpath', '//fsw-countries[contains(@class,"countries__country")]')
-countries = driver.find_elements('xpath', '//span[contains(@class,"countries__country-inner")]')
-print(len(countries))
-country = countries[1]
+origins = driver.find_elements('xpath', '//span[contains(@class,"countries__country-inner")]')
+print(len(origins))
+country = origins[1]
 country_name = country.get_attribute("innerHTML")
 print(country_name)
 # driver.execute_script("arguments[0].click();", country)
 country.click()
-# origin_airports = driver.find_elements(By.TAG_NAME, 'fsw-airport-item')
+origin_airports_clickable = driver.find_elements(By.TAG_NAME, 'fsw-airport-item')
 origin_airports = driver.find_elements('xpath', '//fsw-airport-item//span[@data-ref="airport-item__name"]')
 len(origin_airports)
-origin_airport_code = origin_airports[0].get_attribute("data-id")
+origin_airport = origin_airports[0]
+origin_airport_code = origin_airport.get_attribute("data-id")
+print(origin_airport_code)
 origin_airport_name = re.sub('[\W_]+', '', origin_airports[0].get_attribute("innerHTML"))
+# origin_airports_clickable[0].click()
+driver.execute_script("arguments[0].click();", origin_airports_clickable[0])
 
+
+
+## destination
+destinations =  driver.find_elements('xpath', '//span[contains(@class,"countries__country-inner")]')
+print(len(destinations))
+destination_country = destinations[3]
+print(destination_country.get_attribute("innerHTML"))
+'not-available' not in destination_country.get_attribute('class')
+destination_country.click()
+destination_airports_clickable = driver.find_elements(By.TAG_NAME, 'fsw-airport-item')
+len(destination_airports_clickable)
+destination_airports = driver.find_elements('xpath', '//fsw-airport-item//span[@data-ref="airport-item__name"]')
+destination_airport = destination_airports[0]
+destination_airport_code = destination_airport.get_attribute("data-id")
+print(destination_airport_code)
+destination_airport_name = re.sub('[\W_]+', '', destination_airports[0].get_attribute("innerHTML"))
+print(destination_airport_name)
 
 
 
@@ -217,6 +238,8 @@ driver.find_element('xpath', '//button[contains(@class,"flight-search-widget__st
 # fares = driver.find_elements('xpath', '//carousel-item[@class="ng-star-inserted"]')
 
 
+# scroll to see better
+ActionChains(driver).scroll_by_amount(0, 100).perform()
 driver.save_screenshot("screenshot1.png")
 driver.quit()
 
