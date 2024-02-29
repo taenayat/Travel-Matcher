@@ -240,7 +240,7 @@ for origin_idx in range(2):
 
 
 # scroll to see better
-scroll(driver, 100)
+# scroll(driver, 100)
 # driver.save_screenshot("screenshot1.png")
 driver.quit()
 
