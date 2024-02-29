@@ -229,16 +229,18 @@ click_origin_box(driver)
 countries_len = len(find_countries(driver))
 
 origin_box_is_open = True
-for origin_idx in range(countries_len):
+for origin_idx in range(34,countries_len):
     if not origin_box_is_open:
         click_origin_box(driver)
+        origin_box_is_open = True
     origin_country_name = origin_country_select(driver, origin_idx)
-    time.sleep(0.1)
+    time.sleep(2)
 
     origin_airports = find_airports(driver)
     for origin_airport_idx in range(len(origin_airports)):
         if not origin_box_is_open:
             click_origin_box(driver)
+            origin_box_is_open = True
         origin_airport_code, origin_airport_name = airport_select(driver, origin_airport_idx)
         time.sleep(0.1)
 
@@ -258,25 +260,26 @@ for origin_idx in range(countries_len):
                     print(origin_country_name, origin_airport_code,origin_airport_name,
                         destination_country_name,destination_airport_code,destination_airport_name)
                     print(len(data_list))
-                    time.sleep(1)
+                    time.sleep(0.1)
 
 
 df = pd.DataFrame(data_list)
+df.to_csv("origin_destination_pair4.csv")
 
 # scroll to see better
 # scroll(driver, 100)
 driver.save_screenshot("screenshot1.png")
 driver.quit()
 
-dest_airport_idx
-airport_select(driver, 12, is_origin=False)
-len(find_airports(driver))
-a = driver.find_elements('xpath','//fsw-airport-item//span[@data-ref="airport-item__name"]')
-a[0].click()
-driver.execute_script("arguments[0].click();", a[0])
-ActionChains(driver).move_to_element(a[5]).click().perform()
-a = driver.find_elements('xpath','//fsw-airport-item//span[contains(@data-ref,"airport-item")]')
-len(a)
+# dest_airport_idx
+# airport_select(driver, 12, is_origin=False)
+# len(find_airports(driver))
+# a = driver.find_elements('xpath','//fsw-airport-item//span[@data-ref="airport-item__name"]')
+# a[0].click()
+# driver.execute_script("arguments[0].click();", a[0])
+# ActionChains(driver).move_to_element(a[5]).click().perform()
+# a = driver.find_elements('xpath','//fsw-airport-item//span[contains(@data-ref,"airport-item")]')
+# len(a)
 
 # driver = init_driver(options)
 # driver.get("http://ryanair.com")
@@ -288,9 +291,14 @@ len(a)
 # driver.quit()
 
 
-
-
-
+# df1 = pd.read_csv('origin_destination_pair2.csv')[['origin_country_name', 'origin_airport_code',
+#        'origin_airport_name', 'dest_country_name', 'dest_airport_code',
+#        'dest_airport_name']]
+# df2 = pd.read_csv('origin_destination_pair4.csv')[['origin_country_name', 'origin_airport_code',
+#        'origin_airport_name', 'dest_country_name', 'dest_airport_code',
+#        'dest_airport_name']]
+# df = pd.concat([df1,df2])
+# df.to_csv('origin_destination_pair.csv', index=False)
 
 
 
