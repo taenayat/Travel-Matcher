@@ -196,14 +196,10 @@ def destination_country_select(destination_country):
     return destination_country_name
 
 def airport_select(driver, airport_idx, is_origin=True):
-    # airport_clickable = find_airports_clickable(driver)[airport_idx]
-    # if airport_idx != 0: click_origin_box(driver)
     airport = find_airports(driver)[airport_idx]
 
     airport_code = get_airport_code(airport)
     airport_name = get_name(airport)
-    # if is_origin: action_click(driver, airport_clickable)
-    # if is_origin: action_click(driver, airport)
     if is_origin: script_click(driver, airport)
     return airport_code, airport_name
 
@@ -264,43 +260,11 @@ for origin_idx in range(34,countries_len):
 
 
 df = pd.DataFrame(data_list)
-df.to_csv("origin_destination_pair4.csv")
+df.to_csv("origin_destination_pair2.csv")
 
 # scroll to see better
 # scroll(driver, 100)
 driver.save_screenshot("screenshot1.png")
 driver.quit()
-
-# dest_airport_idx
-# airport_select(driver, 12, is_origin=False)
-# len(find_airports(driver))
-# a = driver.find_elements('xpath','//fsw-airport-item//span[@data-ref="airport-item__name"]')
-# a[0].click()
-# driver.execute_script("arguments[0].click();", a[0])
-# ActionChains(driver).move_to_element(a[5]).click().perform()
-# a = driver.find_elements('xpath','//fsw-airport-item//span[contains(@data-ref,"airport-item")]')
-# len(a)
-
-# driver = init_driver(options)
-# driver.get("http://ryanair.com")
-# accept_cookies(driver)
-# click_origin_box(driver)
-# driver.find_element(By.XPATH, '//*[@id="input-button__departure"]').click()
-# countries = find_countries(driver)
-# len(countries)
-# driver.quit()
-
-
-# df1 = pd.read_csv('origin_destination_pair2.csv')[['origin_country_name', 'origin_airport_code',
-#        'origin_airport_name', 'dest_country_name', 'dest_airport_code',
-#        'dest_airport_name']]
-# df2 = pd.read_csv('origin_destination_pair4.csv')[['origin_country_name', 'origin_airport_code',
-#        'origin_airport_name', 'dest_country_name', 'dest_airport_code',
-#        'dest_airport_name']]
-# df = pd.concat([df1,df2])
-# df.to_csv('origin_destination_pair.csv', index=False)
-
-
-
 
 
