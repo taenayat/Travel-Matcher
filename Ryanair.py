@@ -225,29 +225,39 @@ def is_available(element):
 
 def origin_country_select(driver, origin_idx):
     if origin_idx != 0: click_origin_box(driver)
-    origin_countries = find_countries(driver)
-    origin_country = origin_countries[origin_idx]
+    origin_country = find_countries(driver)[origin_idx]
     origin_country_name = origin_country.get_attribute("innerHTML")
     origin_country.click()
     return origin_country_name
 
-def airport_select(driver, airport_idx):
-    origin_airport_clickable = find_airports_clickable(driver)[airport_idx]
-    origin_airport = find_airports(driver)[airport_idx]
+def destination_country_select(destination_country):
+    destination_country_name = get_airport_name(destination_country)
+    destination_country.click()
+    return destination_country_name
 
-    origin_airport_code = get_airport_code(origin_airport)
-    origin_airport_name = get_airport_name(origin_airport)
-    script_click(driver, origin_airport_clickable)
-    return origin_airport_code, origin_airport_name
+def airport_select(driver, airport_idx, is_origin=True):
+    airport_clickable = find_airports_clickable(driver)[airport_idx]
+    airport = find_airports(driver)[airport_idx]
 
-def destination_airport_select(destination_airport, destination_airport_clickable):
-    destination_airport_code = destination_airport.get_attribute("data-id")
-    destination_airport_name = re.sub('[\W_]+', '', destination_airports[0].get_attribute("innerHTML"))
-    return destination_airport_code, destination_airport_name
+    airport_code = get_airport_code(airport)
+    airport_name = get_airport_name(airport)
+    if is_origin: script_click(driver, airport_clickable)
+    return airport_code, airport_name
+
+def append_to_list(l, origin_country_name, origin_airport_code,origin_airport_name,
+                   desination_country_name,destination_airport_code,destination_airport_name):
+    dic = {'origin_country_name': origin_country_name, 
+        'origin_airport_code': origin_airport_code, 
+        'origin_airport_name': origin_airport_name, 
+        'dest_country_name': desination_country_name, 
+        'dest_airport_code': destination_airport_code, 
+        'dest_airport_name': destination_airport_name}
+    l.append(dic)
 
 
 ## For loop
 # df = pd.DataFrame()
+data_list = []
 # select origin box
 # driver.find_element('xpath', '//*[@id="input-button__departure"]').click()
 click_origin_box(driver)
@@ -275,8 +285,7 @@ for origin_idx in range(2):
         for destination_idx in range(2):
             destination_country =  find_countries(driver)[destination_idx]
             if is_available(destination_country):
-                desination_country_name = destination_country.get_attribute("innerHTML")
-                destination_country.click()
+                desination_country_name = destination_country_select(destination_country)
                 destination_airports_clickable = find_airports_clickable(driver)
                 # destination_airports = driver.find_elements('xpath', '//fsw-airport-item//span[@data-ref="airport-item__name"]')
                 # len(destination_airports_clickable)
@@ -285,15 +294,10 @@ for origin_idx in range(2):
                 # for destination_airport, destination_airport_clickable in zip(destination_airports[:trunc], destination_airports_clickable[:trunc]):
                 # for dest_airport_idx in range(len(destination_airports_clickable)):    
                 for dest_airport_idx in range(2):    
-                    destination_airport_code, destination_airport_name = destination_airport_select(destination_airport, destination_airport_clickable)
+                    destination_airport_code, destination_airport_name = airport_select(driver, dest_airport_idx, is_origin=False)
                     
-                    dic = {'origin_country_name': origin_country_name, 
-                           'origin_airport_code': origin_airport_code, 
-                           'origin_airport_name': origin_airport_name, 
-                           'dest_country_name': desination_country_name, 
-                           'dest_airport_code': destination_airport_code, 
-                           'dest_airport_name': destination_airport_name}
-                    print("final:", dic)
+                    append_to_list(data_list)
+                    # print("final:", dic)
                     time.sleep(1)
 
 
