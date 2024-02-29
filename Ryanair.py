@@ -168,51 +168,59 @@ def find_countries(driver):
 def find_airports(driver):
     # return driver.find_elements('xpath', '//fsw-airport-item//span[@data-ref="airport-item__name"]')
     return wait.until(present_list('//fsw-airport-item//span[@data-ref="airport-item__name"]'))
-def find_airports_clickable(driver):
-    # return driver.find_elements(By.TAG_NAME, 'fsw-airport-item')
-    return wait.until(EC.presence_of_all_elements_located((By.TAG_NAME, 'fsw-airport-item')))
-def get_airport_name(airport):
+    # return wait.until(present_list('//fsw-airport-item//span[contains(@data-ref,"airport-item")]'))
+# def find_airports_clickable(driver):
+#     # return driver.find_elements(By.TAG_NAME, 'fsw-airport-item')
+#     return wait.until(EC.presence_of_all_elements_located((By.TAG_NAME, 'fsw-airport-item')))
+def get_name(airport):
     return re.sub('[\W_]+', '', airport.get_attribute("innerHTML"))
 def get_airport_code(airport):
     return airport.get_attribute("data-id")
 def script_click(driver, element):
     driver.execute_script("arguments[0].click();", element)
+def action_click(driver, element):
+    actions.move_to_element(element).click().perform()
 def is_available(element):
     return'not-available' not in element.get_attribute('class')
 
 def origin_country_select(driver, origin_idx):
-    if origin_idx != 0: click_origin_box(driver)
+    # if origin_idx != 0: click_origin_box(driver)
     origin_country = find_countries(driver)[origin_idx]
-    origin_country_name = origin_country.get_attribute("innerHTML")
+    origin_country_name = get_name(origin_country)
     origin_country.click()
     return origin_country_name
 
 def destination_country_select(destination_country):
-    destination_country_name = get_airport_name(destination_country)
+    destination_country_name = get_name(destination_country)
     destination_country.click()
     return destination_country_name
 
 def airport_select(driver, airport_idx, is_origin=True):
-    airport_clickable = find_airports_clickable(driver)[airport_idx]
+    # airport_clickable = find_airports_clickable(driver)[airport_idx]
+    # if airport_idx != 0: click_origin_box(driver)
     airport = find_airports(driver)[airport_idx]
 
     airport_code = get_airport_code(airport)
-    airport_name = get_airport_name(airport)
-    if is_origin: script_click(driver, airport_clickable)
+    airport_name = get_name(airport)
+    # if is_origin: action_click(driver, airport_clickable)
+    # if is_origin: action_click(driver, airport)
+    if is_origin: script_click(driver, airport)
     return airport_code, airport_name
 
 def append_to_list(l, origin_country_name, origin_airport_code,origin_airport_name,
-                   desination_country_name,destination_airport_code,destination_airport_name):
+                   destination_country_name,destination_airport_code,destination_airport_name):
     dic = {'origin_country_name': origin_country_name, 
         'origin_airport_code': origin_airport_code, 
         'origin_airport_name': origin_airport_name, 
-        'dest_country_name': desination_country_name, 
+        'dest_country_name': destination_country_name, 
         'dest_airport_code': destination_airport_code, 
         'dest_airport_name': destination_airport_name}
     l.append(dic)
 
+
 driver = init_driver(options)
 wait = WebDriverWait(driver, 10)
+actions = ActionChains(driver)
 driver.get("http://ryanair.com")
 accept_cookies(driver)
 
@@ -220,50 +228,64 @@ data_list = []
 click_origin_box(driver)
 countries_len = len(find_countries(driver))
 
-# for origin_idx in range(countries_len):
-for origin_idx in range(2):
+origin_box_is_open = True
+for origin_idx in range(countries_len):
+    if not origin_box_is_open:
+        click_origin_box(driver)
     origin_country_name = origin_country_select(driver, origin_idx)
-    time.sleep(1)
+    time.sleep(0.1)
 
-    origin_airports_clickable = find_airports_clickable(driver)
-    # for airport_idx in range(len(origin_airports_clickable)):
-    for origin_airport_idx in range(2):
+    origin_airports = find_airports(driver)
+    for origin_airport_idx in range(len(origin_airports)):
+        if not origin_box_is_open:
+            click_origin_box(driver)
         origin_airport_code, origin_airport_name = airport_select(driver, origin_airport_idx)
-        time.sleep(1)
+        time.sleep(0.1)
 
-        # for destination_idx in range(countries_len):
-        for destination_idx in range(2):
+        for destination_idx in range(countries_len):
+            origin_box_is_open = False
             destination_country =  find_countries(driver)[destination_idx]
             if is_available(destination_country):
-                desination_country_name = destination_country_select(destination_country)
-                destination_airports_clickable = find_airports_clickable(driver)
-                time.sleep(1)
+                destination_country_name = destination_country_select(destination_country)
+                destination_airports = find_airports(driver)
+                time.sleep(0.1)
 
-                # for dest_airport_idx in range(len(destination_airports_clickable)):    
-                for dest_airport_idx in range(2):    
+                for dest_airport_idx in range(len(destination_airports)):    
                     destination_airport_code, destination_airport_name = airport_select(driver, dest_airport_idx, is_origin=False)
                     
-                    append_to_list(data_list)
+                    append_to_list(data_list, origin_country_name, origin_airport_code,origin_airport_name,
+                        destination_country_name,destination_airport_code,destination_airport_name)
+                    print(origin_country_name, origin_airport_code,origin_airport_name,
+                        destination_country_name,destination_airport_code,destination_airport_name)
+                    print(len(data_list))
                     time.sleep(1)
 
 
+df = pd.DataFrame(data_list)
 
 # scroll to see better
 # scroll(driver, 100)
 driver.save_screenshot("screenshot1.png")
 driver.quit()
 
+dest_airport_idx
+airport_select(driver, 12, is_origin=False)
+len(find_airports(driver))
+a = driver.find_elements('xpath','//fsw-airport-item//span[@data-ref="airport-item__name"]')
+a[0].click()
+driver.execute_script("arguments[0].click();", a[0])
+ActionChains(driver).move_to_element(a[5]).click().perform()
+a = driver.find_elements('xpath','//fsw-airport-item//span[contains(@data-ref,"airport-item")]')
+len(a)
 
-
-
-driver = init_driver(options)
-driver.get("http://ryanair.com")
-accept_cookies(driver)
-click_origin_box(driver)
-driver.find_element(By.XPATH, '//*[@id="input-button__departure"]').click()
-countries = find_countries(driver)
-len(countries)
-driver.quit()
+# driver = init_driver(options)
+# driver.get("http://ryanair.com")
+# accept_cookies(driver)
+# click_origin_box(driver)
+# driver.find_element(By.XPATH, '//*[@id="input-button__departure"]').click()
+# countries = find_countries(driver)
+# len(countries)
+# driver.quit()
 
 
 
