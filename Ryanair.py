@@ -154,14 +154,23 @@ def accept_cookies(driver):
     driver.find_element("xpath", '//*[@id="cookie-popup-with-overlay"]/div/div[3]/button[3]').click()
 def scroll(driver, amount):
     ActionChains(driver).scroll_by_amount(0, 100).perform()
+def clickable(xpath_str):
+    return EC.element_to_be_clickable((By.XPATH, xpath_str))
+def present_list(xpath_str):
+    return EC.presence_of_all_elements_located((By.XPATH, xpath_str))
+
 def click_origin_box(driver): 
-    driver.find_element('xpath', '//*[@id="input-button__departure"]').click()
+    wait.until(clickable('//*[@id="input-button__departure"]')).click()
+    # wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="input-button__departure"]'))).click()
 def find_countries(driver):
-    return driver.find_elements('xpath', '//span[contains(@class,"countries__country-inner")]')
+    # return driver.find_elements('xpath', )
+    return wait.until(present_list('//span[contains(@class,"countries__country-inner")]'))
 def find_airports(driver):
-    return driver.find_elements('xpath', '//fsw-airport-item//span[@data-ref="airport-item__name"]')
+    # return driver.find_elements('xpath', '//fsw-airport-item//span[@data-ref="airport-item__name"]')
+    return wait.until(present_list('//fsw-airport-item//span[@data-ref="airport-item__name"]'))
 def find_airports_clickable(driver):
-    return driver.find_elements(By.TAG_NAME, 'fsw-airport-item')
+    # return driver.find_elements(By.TAG_NAME, 'fsw-airport-item')
+    return wait.until(EC.presence_of_all_elements_located((By.TAG_NAME, 'fsw-airport-item')))
 def get_airport_name(airport):
     return re.sub('[\W_]+', '', airport.get_attribute("innerHTML"))
 def get_airport_code(airport):
@@ -202,8 +211,8 @@ def append_to_list(l, origin_country_name, origin_airport_code,origin_airport_na
         'dest_airport_name': destination_airport_name}
     l.append(dic)
 
-
 driver = init_driver(options)
+wait = WebDriverWait(driver, 10)
 driver.get("http://ryanair.com")
 accept_cookies(driver)
 
@@ -241,14 +250,20 @@ for origin_idx in range(2):
 
 # scroll to see better
 # scroll(driver, 100)
-# driver.save_screenshot("screenshot1.png")
+driver.save_screenshot("screenshot1.png")
 driver.quit()
 
 
 
 
-
-
+driver = init_driver(options)
+driver.get("http://ryanair.com")
+accept_cookies(driver)
+click_origin_box(driver)
+driver.find_element(By.XPATH, '//*[@id="input-button__departure"]').click()
+countries = find_countries(driver)
+len(countries)
+driver.quit()
 
 
 
