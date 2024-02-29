@@ -215,9 +215,13 @@ def find_airports(driver):
 def find_airports_clickable(driver):
     return driver.find_elements(By.TAG_NAME, 'fsw-airport-item')
 def get_airport_name(airport):
-    re.sub('[\W_]+', '', airport.get_attribute("innerHTML"))
+    return re.sub('[\W_]+', '', airport.get_attribute("innerHTML"))
+def get_airport_code(airport):
+    return airport.get_attribute("data-id")
 def script_click(driver, element):
     driver.execute_script("arguments[0].click();", element)
+def is_available(element):
+    return'not-available' not in element.get_attribute('class')
 
 def origin_country_select(driver, origin_idx):
     if origin_idx != 0: click_origin_box(driver)
@@ -227,14 +231,11 @@ def origin_country_select(driver, origin_idx):
     origin_country.click()
     return origin_country_name
 
-def origin_airport_select(driver, airport_idx):
-    origin_airports_clickable = find_airports_clickable(driver)
-    origin_airports = find_airports(driver)
+def airport_select(driver, airport_idx):
+    origin_airport_clickable = find_airports_clickable(driver)[airport_idx]
+    origin_airport = find_airports(driver)[airport_idx]
 
-    origin_airport_clickable = origin_airports_clickable[airport_idx]
-    origin_airport = origin_airports[airport_idx]
-
-    origin_airport_code = origin_airport.get_attribute("data-id")
+    origin_airport_code = get_airport_code(origin_airport)
     origin_airport_name = get_airport_name(origin_airport)
     script_click(driver, origin_airport_clickable)
     return origin_airport_code, origin_airport_name
@@ -257,33 +258,33 @@ for origin_idx in range(2):
     origin_country_name = origin_country_select(driver, origin_idx)
     time.sleep(1)
 
-    origin_airports_clickable = driver.find_elements(By.TAG_NAME, 'fsw-airport-item')
+    origin_airports_clickable = find_airports_clickable(driver)
     # origin_airports = driver.find_elements('xpath', '//fsw-airport-item//span[@data-ref="airport-item__name"]')
     # len(origin_airports)
 
     # trunc = 2
     # for origin_airport, origin_airport_clickable in zip(origin_airports[:trunc], origin_airports_clickable[:trunc]):
     # for airport_idx in range(len(origin_airports_clickable)):
-    for airport_idx in range(2):
-        origin_airport_code, origin_airport_name = origin_airport_select(driver, airport_idx)
+    for origin_airport_idx in range(2):
+        origin_airport_code, origin_airport_name = airport_select(driver, origin_airport_idx)
         time.sleep(1)
 
         # destination_countries =  find_countries(driver)
         # for destination_country in destination_countries:
         # for destination_idx in range(countries_len):
         for destination_idx in range(2):
-            destination_countries =  driver.find_elements('xpath', '//span[contains(@class,"countries__country-inner")]')
-            destination_country = destination_countries[destination_idx]
-            if 'not-available' not in destination_country.get_attribute('class'): # dest country is available
+            destination_country =  find_countries(driver)[destination_idx]
+            if is_available(destination_country):
                 desination_country_name = destination_country.get_attribute("innerHTML")
-                print(desination_country_name)
                 destination_country.click()
-                destination_airports_clickable = driver.find_elements(By.TAG_NAME, 'fsw-airport-item')
-                destination_airports = driver.find_elements('xpath', '//fsw-airport-item//span[@data-ref="airport-item__name"]')
+                destination_airports_clickable = find_airports_clickable(driver)
+                # destination_airports = driver.find_elements('xpath', '//fsw-airport-item//span[@data-ref="airport-item__name"]')
                 # len(destination_airports_clickable)
                 time.sleep(1)
 
-                for destination_airport, destination_airport_clickable in zip(destination_airports[:trunc], destination_airports_clickable[:trunc]):
+                # for destination_airport, destination_airport_clickable in zip(destination_airports[:trunc], destination_airports_clickable[:trunc]):
+                # for dest_airport_idx in range(len(destination_airports_clickable)):    
+                for dest_airport_idx in range(2):    
                     destination_airport_code, destination_airport_name = destination_airport_select(destination_airport, destination_airport_clickable)
                     
                     dic = {'origin_country_name': origin_country_name, 
