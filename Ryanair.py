@@ -203,62 +203,74 @@ destination_airport_name = re.sub('[\W_]+', '', destination_airports[0].get_attr
 print(destination_airport_name)
 
 
+
+
+
 def click_origin_box(driver): 
     driver.find_element('xpath', '//*[@id="input-button__departure"]').click()
 def find_countries(driver):
     return driver.find_elements('xpath', '//span[contains(@class,"countries__country-inner")]')
+def find_airports(driver):
+    return driver.find_elements('xpath', '//fsw-airport-item//span[@data-ref="airport-item__name"]')
+def find_airports_clickable(driver):
+    return driver.find_elements(By.TAG_NAME, 'fsw-airport-item')
+def get_airport_name(airport):
+    re.sub('[\W_]+', '', airport.get_attribute("innerHTML"))
 def script_click(driver, element):
     driver.execute_script("arguments[0].click();", element)
 
 def origin_country_select(driver, origin_idx):
     if origin_idx != 0: click_origin_box(driver)
     origin_countries = find_countries(driver)
-    # print(len(origin_countries))
     origin_country = origin_countries[origin_idx]
     origin_country_name = origin_country.get_attribute("innerHTML")
-    # print(origin_country_name)
     origin_country.click()
     return origin_country_name
 
-def origin_airport_select(origin_airport, origin_airport_clickable):
+def origin_airport_select(driver, airport_idx):
+    origin_airports_clickable = find_airports_clickable(driver)
+    origin_airports = find_airports(driver)
+
+    origin_airport_clickable = origin_airports_clickable[airport_idx]
+    origin_airport = origin_airports[airport_idx]
+
     origin_airport_code = origin_airport.get_attribute("data-id")
-    # print(origin_airport_code)
-    origin_airport_name = re.sub('[\W_]+', '', origin_airport.get_attribute("innerHTML"))
-    # origin_airports_clickable[0].click()
+    origin_airport_name = get_airport_name(origin_airport)
     script_click(driver, origin_airport_clickable)
     return origin_airport_code, origin_airport_name
 
 def destination_airport_select(destination_airport, destination_airport_clickable):
     destination_airport_code = destination_airport.get_attribute("data-id")
-    # print(destination_airport_code)
     destination_airport_name = re.sub('[\W_]+', '', destination_airports[0].get_attribute("innerHTML"))
-    # print(destination_airport_name)
     return destination_airport_code, destination_airport_name
 
 
 ## For loop
 # df = pd.DataFrame()
 # select origin box
-driver.find_element('xpath', '//*[@id="input-button__departure"]').click()
-origin_countries = driver.find_elements('xpath', '//span[contains(@class,"countries__country-inner")]')
+# driver.find_element('xpath', '//*[@id="input-button__departure"]').click()
+click_origin_box(driver)
+countries_len = len(find_countries(driver))
 # for origin_country in origin_countries[:2]:
-# for origin_idx in range(len(origin_countries)):
+# for origin_idx in range(countries_len):
 for origin_idx in range(2):
     origin_country_name = origin_country_select(driver, origin_idx)
     time.sleep(1)
 
     origin_airports_clickable = driver.find_elements(By.TAG_NAME, 'fsw-airport-item')
-    origin_airports = driver.find_elements('xpath', '//fsw-airport-item//span[@data-ref="airport-item__name"]')
+    # origin_airports = driver.find_elements('xpath', '//fsw-airport-item//span[@data-ref="airport-item__name"]')
     # len(origin_airports)
 
-    trunc = 2
-    for origin_airport, origin_airport_clickable in zip(origin_airports[:trunc], origin_airports_clickable[:trunc]):
-        origin_airport_code, origin_airport_name = origin_airport_select(origin_airport, origin_airport_clickable)
+    # trunc = 2
+    # for origin_airport, origin_airport_clickable in zip(origin_airports[:trunc], origin_airports_clickable[:trunc]):
+    # for airport_idx in range(len(origin_airports_clickable)):
+    for airport_idx in range(2):
+        origin_airport_code, origin_airport_name = origin_airport_select(driver, airport_idx)
         time.sleep(1)
 
-        destination_countries =  driver.find_elements('xpath', '//span[contains(@class,"countries__country-inner")]')
+        # destination_countries =  find_countries(driver)
         # for destination_country in destination_countries:
-        # for destination_idx in range(len(destination_countries)):
+        # for destination_idx in range(countries_len):
         for destination_idx in range(2):
             destination_countries =  driver.find_elements('xpath', '//span[contains(@class,"countries__country-inner")]')
             destination_country = destination_countries[destination_idx]
