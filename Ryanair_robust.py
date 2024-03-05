@@ -58,9 +58,9 @@ driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), opti
 driver.get(url)
 
 try:
-    element = WebDriverWait(driver, 10).until(
-        EC.visibility_of_element_located((By.XPATH, '//button[@class="cookie-popup-with-overlay__button"]')))
-    element.click()
+    WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.XPATH, '//button[@class="cookie-popup-with-overlay__button"]'))).click()
+        # EC.visibility_of_element_located((By.XPATH, '//button[@class="cookie-popup-with-overlay__button"]')))
 except:
     print("Cookies button not found within 10 seconds")
 
