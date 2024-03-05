@@ -58,8 +58,11 @@ driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), opti
 driver.get(url)
 
 try:
-    WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.XPATH, '//button[@class="cookie-popup-with-overlay__button"]'))).click()
+    element = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.XPATH, '//button[contains(@class,"cookie-popup-with-overlay__button") and @data-ref="cookie.accept-all"]')))
+        # EC.element_to_be_clickable((By.XPATH, '//button[contains(@class,"cookie-popup-with-overlay__button")]')))
+    element.click()
+    # ActionChains(driver).move_to_element(element).click().perform()
         # EC.visibility_of_element_located((By.XPATH, '//button[@class="cookie-popup-with-overlay__button"]')))
 except:
     print("Cookies button not found within 10 seconds")
@@ -85,7 +88,7 @@ while current_date <= end and all_null_counter < 3:
     # print("condition:", current_date <= end_date)
     # current_date = datetime.strptime(re.findall(r'tpStartDate=.{10}', driver.current_url)[0][-10:], '%Y-%m-%d').date()
     WebDriverWait(driver, 10).until(
-        EC.visibility_of_element_located((By.XPATH, '//button[contains(@class,"carousel-next")]'))).click()
+        EC.element_to_be_clickable((By.XPATH, '//button[contains(@class,"carousel-next")]'))).click()
     df_temp, current_date = fares_dataframe(driver)
     time.sleep(1)
     print(df_temp)
@@ -100,7 +103,10 @@ df['destination'] = destination
 df['fetch_date'] = start_date
 df.to_csv('{0}_{1}_{2}_{3}.csv'.format(origin, destination, start_date.strftime('%Y%m%d'),end_date.replace('-','')), index=False)
 
-# driver.save_screenshot("screenshot1.png")
+
+# from selenium.webdriver.common.action_chains import ActionChains
+# ActionChains(driver).scroll_by_amount(0, 100).perform()
+driver.save_screenshot("screenshot1.png")
 driver.quit()
 
 
