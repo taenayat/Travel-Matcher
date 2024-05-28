@@ -1,0 +1,6 @@
+# draft.py
+venv/
+.vscode/
+chromedriver
+*.csv
+html.txt

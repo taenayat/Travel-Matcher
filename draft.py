@@ -66,3 +66,43 @@ driver.quit()
 # one_way_flight.click()
 # driver.execute_script("arguments[0].click();", one_way_flight)
 
+
+
+
+# dest_airport_idx
+# airport_select(driver, 12, is_origin=False)
+# len(find_airports(driver))
+# a = driver.find_elements('xpath','//fsw-airport-item//span[@data-ref="airport-item__name"]')
+# a[0].click()
+# driver.execute_script("arguments[0].click();", a[0])
+# ActionChains(driver).move_to_element(a[5]).click().perform()
+# a = driver.find_elements('xpath','//fsw-airport-item//span[contains(@data-ref,"airport-item")]')
+# len(a)
+
+# driver = init_driver(options)
+# driver.get("http://ryanair.com")
+# accept_cookies(driver)
+# click_origin_box(driver)
+# driver.find_element(By.XPATH, '//*[@id="input-button__departure"]').click()
+# countries = find_countries(driver)
+# len(countries)
+# driver.quit()
+
+
+# df1 = pd.read_csv('origin_destination_pair2.csv')[['origin_country_name', 'origin_airport_code',
+#        'origin_airport_name', 'dest_country_name', 'dest_airport_code',
+#        'dest_airport_name']]
+# df2 = pd.read_csv('origin_destination_pair4.csv')[['origin_country_name', 'origin_airport_code',
+#        'origin_airport_name', 'dest_country_name', 'dest_airport_code',
+#        'dest_airport_name']]
+# df = pd.concat([df1,df2])
+# df.to_csv('origin_destination_pair.csv', index=False)
+
+
+
+#######################################
+###### CHECK THE AIRPORT PAIRS ########
+#######################################
+
+import pandas as pd
+pd.read_csv('origin_destination_pairs.csv')
